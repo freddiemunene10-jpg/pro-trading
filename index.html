@@ -1,0 +1,2416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vertex Trade — Trading Terminal</title>
+
+<style>
+:root{
+    --bg:#080d16;
+    --panel:#101827;
+    --panel2:#0c1421;
+    --line:#202d40;
+    --muted:#8493a8;
+    --text:#edf3fb;
+    --green:#19c784;
+    --red:#f05b6b;
+    --blue:#4d8dff;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+}
+
+button,input,select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+    border:0;
+    color:inherit;
+}
+
+/* ================= SIDEBAR ================= */
+
+.app{
+    min-height:100vh;
+    display:grid;
+    grid-template-columns:224px minmax(0,1fr);
+}
+
+.sidebar{
+    background:#0b1220;
+    border-right:1px solid var(--line);
+    padding:22px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:18px;
+    font-weight:800;
+    padding:0 9px;
+}
+
+.brand-mark{
+    width:30px;
+    height:30px;
+    border-radius:9px;
+    background:linear-gradient(135deg,#4d8dff,#19c784);
+    display:grid;
+    place-items:center;
+    color:#07111c;
+    font-weight:900;
+}
+
+.nav-label{
+    color:#61718a;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.5px;
+    padding:0 11px;
+    margin-bottom:8px;
+}
+
+.nav{
+    display:grid;
+    gap:5px;
+}
+
+.nav a{
+    color:#9baac0;
+    text-decoration:none;
+    padding:11px;
+    border-radius:9px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
+
+.nav a.active,
+.nav a:hover{
+    background:#17253a;
+    color:white;
+}
+
+.nav .ico{
+    width:18px;
+    text-align:center;
+    font-size:16px;
+}
+
+.side-bottom{
+    margin-top:auto;
+    background:#111e30;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px;
+}
+
+.side-bottom small{
+    color:var(--muted);
+}
+
+.side-bottom strong{
+    display:block;
+    margin:7px 0;
+}
+
+.upgrade{
+    background:#244c8b;
+    color:white;
+    padding:9px 12px;
+    border-radius:7px;
+    width:100%;
+    margin-top:9px;
+}
+
+/* ================= MAIN ================= */
+
+.main{
+    min-width:0;
+}
+
+.topbar{
+    height:68px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 25px;
+    background:#0b1220;
+    position:sticky;
+    top:0;
+    z-index:5;
+}
+
+.search{
+    background:#111c2b;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 12px;
+    color:#8fa0b7;
+    width:240px;
+}
+
+.top-actions{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.icon-btn{
+    background:transparent;
+    color:#aebbd0;
+    font-size:18px;
+}
+
+.avatar{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:#28456b;
+    display:grid;
+    place-items:center;
+    font-weight:700;
+}
+
+.content{
+    padding:22px 25px 30px;
+    max-width:1700px;
+    margin:auto;
+}
+
+.welcome{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.welcome h1{
+    font-size:22px;
+    margin:0 0 5px;
+}
+
+.welcome p{
+    margin:0;
+    color:var(--muted);
+}
+
+.date{
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* ================= STATS ================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:13px;
+    margin-bottom:17px;
+}
+
+.stat,
+.panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+}
+
+.stat{
+    padding:16px;
+}
+
+.stat-head{
+    display:flex;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.stat-value{
+    font-size:23px;
+    font-weight:750;
+    margin:12px 0 6px;
+}
+
+.positive{
+    color:var(--green);
+}
+
+.negative{
+    color:var(--red);
+}
+
+.stat-foot{
+    font-size:11px;
+    color:var(--muted);
+}
+
+.stat-icon{
+    color:#7eaaff;
+}
+
+/* ================= WORKSPACE ================= */
+
+.workspace{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 310px;
+    gap:15px;
+    align-items:start;
+}
+
+.left-col,
+.right-col{
+    display:grid;
+    gap:15px;
+    min-width:0;
+}
+
+.panel{
+    padding:16px;
+}
+
+.panel-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+}
+
+.panel-title h2{
+    font-size:14px;
+    margin:0;
+}
+
+.subtle{
+    color:var(--muted);
+    font-size:11px;
+}
+
+/* ================= MARKET ================= */
+
+.pair{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.coin{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:#f7931a;
+    color:#201307;
+    font-weight:900;
+    display:grid;
+    place-items:center;
+}
+
+.pair-name{
+    font-weight:700;
+}
+
+.price-line{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-top:13px;
+}
+
+.big-price{
+    font-size:25px;
+    font-weight:750;
+}
+
+.range-tabs,
+.chart-tools{
+    display:flex;
+    gap:5px;
+}
+
+.range-tabs button,
+.chart-tools button{
+    background:transparent;
+    color:var(--muted);
+    padding:6px 9px;
+    border-radius:6px;
+    font-size:11px;
+}
+
+.range-tabs button.selected,
+.chart-tools button.selected{
+    background:#20334d;
+    color:white;
+}
+
+/* ================= CHART ================= */
+
+.chart-wrap{
+    height:300px;
+    position:relative;
+    margin-top:8px;
+    background:linear-gradient(
+        180deg,
+        rgba(22,39,61,.25),
+        transparent
+    );
+    border-radius:8px;
+    overflow:hidden;
+}
+
+.chart-wrap canvas{
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+.chart-legend{
+    display:flex;
+    gap:15px;
+    color:var(--muted);
+    font-size:10px;
+    margin-top:8px;
+}
+
+.dot{
+    display:inline-block;
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    margin-right:5px;
+}
+
+/* ================= ORDER ================= */
+
+.order-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.order-card{
+    background:var(--panel2);
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:12px;
+}
+
+.order-card label{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    margin-bottom:7px;
+}
+
+.order-card input,
+.order-card select{
+    width:100%;
+    background:#111e2e;
+    border:1px solid #29384c;
+    border-radius:6px;
+    color:white;
+    padding:10px;
+    outline:none;
+}
+
+.order-card input:focus{
+    border-color:var(--blue);
+}
+
+.trade-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:12px;
+}
+
+.buy{
+    background:#0f9d6c;
+    padding:12px;
+    border-radius:7px;
+    font-weight:750;
+}
+
+.sell{
+    background:#c74758;
+    padding:12px;
+    border-radius:7px;
+    font-weight:750;
+}
+
+.order-note{
+    font-size:10px;
+    color:var(--muted);
+    margin-top:10px;
+    line-height:1.5;
+}
+
+/* ================= WATCHLIST ================= */
+
+.watchlist{
+    display:grid;
+}
+
+.watch-row{
+    display:grid;
+    grid-template-columns:1fr auto auto;
+    gap:10px;
+    align-items:center;
+    padding:11px 0;
+    border-bottom:1px solid #1d2a3c;
+}
+
+.watch-row:last-child{
+    border:0;
+}
+
+.asset{
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+
+.asset-logo{
+    width:27px;
+    height:27px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-size:11px;
+    font-weight:800;
+    background:#293b56;
+}
+
+.asset small{
+    display:block;
+    color:var(--muted);
+    font-size:10px;
+    margin-top:3px;
+}
+
+.watch-price{
+    text-align:right;
+    font-weight:650;
+}
+
+.watch-change{
+    font-size:10px;
+    text-align:right;
+    margin-top:3px;
+}
+
+/* ================= ORDER BOOK ================= */
+
+.book{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.book-head{
+    font-size:10px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
+}
+
+.book-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:11px;
+    padding:5px 0;
+    position:relative;
+}
+
+.depth{
+    position:absolute;
+    right:0;
+    top:0;
+    bottom:0;
+    opacity:.12;
+    z-index:0;
+}
+
+.asks .depth{
+    background:var(--red);
+}
+
+.bids .depth{
+    background:var(--green);
+}
+
+.book-row span{
+    z-index:1;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    white-space:nowrap;
+}
+
+th{
+    text-align:left;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:600;
+    padding:10px 8px;
+    border-bottom:1px solid var(--line);
+}
+
+td{
+    padding:12px 8px;
+    border-bottom:1px solid #1d2a3c;
+    font-size:11px;
+}
+
+tr:last-child td{
+    border:0;
+}
+
+.pill{
+    padding:4px 7px;
+    border-radius:5px;
+    background:#123b31;
+    color:var(--green);
+    font-size:10px;
+}
+
+.pill.loss{
+    background:#3a202b;
+    color:var(--red);
+}
+
+/* ================= TOAST ================= */
+
+.toast{
+    position:fixed;
+    right:22px;
+    bottom:22px;
+    background:#15263a;
+    border:1px solid #315071;
+    padding:13px 17px;
+    border-radius:9px;
+    box-shadow:0 12px 40px #0008;
+    opacity:0;
+    transform:translateY(10px);
+    transition:.25s;
+    pointer-events:none;
+    z-index:10;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+/* ================= TABLET ================= */
+
+@media(max-width:1050px){
+
+    .app{
+        grid-template-columns:70px minmax(0,1fr);
+    }
+
+    .sidebar{
+        padding:20px 9px;
+    }
+
+    .brand{
+        padding:0 10px;
+    }
+
+    .brand-name,
+    .nav-label,
+    .nav a span:not(.ico),
+    .side-bottom{
+        display:none;
+    }
+
+    .nav a{
+        justify-content:center;
+    }
+
+    .workspace{
+        grid-template-columns:minmax(0,1fr) 280px;
+    }
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:760px){
+
+    .app{
+        display:block;
+    }
+
+    .sidebar{
+        display:none;
+    }
+
+    .topbar{
+        height:58px;
+        padding:0 14px;
+    }
+
+    .search{
+        width:min(48vw,220px);
+    }
+
+    .content{
+        padding:17px 12px 25px;
+    }
+
+    .welcome{
+        align-items:flex-start;
+    }
+
+    .welcome h1{
+        font-size:19px;
+    }
+
+    .date{
+        display:none;
+    }
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+        gap:9px;
+    }
+
+    .stat{
+        padding:12px;
+    }
+
+    .stat-value{
+        font-size:19px;
+    }
+
+    .workspace{
+        grid-template-columns:1fr;
+    }
+
+    .chart-wrap{
+        height:260px;
+    }
+
+    .panel{
+        padding:13px;
+    }
+
+    .top-actions{
+        gap:10px;
+    }
+
+    .hide-mobile{
+        display:none;
+    }
+}
+
+/* ================= SMALL PHONE ================= */
+
+@media(max-width:420px){
+
+    .order-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .big-price{
+        font-size:22px;
+    }
+
+    .chart-wrap{
+        height:225px;
+    }
+
+    .range-tabs button{
+        padding:6px;
+    }
+
+    .stats .stat:nth-child(4){
+        display:none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+        <div class="brand-mark">V</div>
+
+        <span class="brand-name">
+            VERTEX<span style="color:#4d8dff">TRADE</span>
+        </span>
+    </div>
+
+    <div>
+
+        <div class="nav-label">
+            WORKSPACE
+        </div>
+
+        <nav class="nav">
+
+            <a class="active" href="#">
+                <span class="ico">▦</span>
+                <span>Overview</span>
+            </a>
+
+            <a href="#markets">
+                <span class="ico">◈</span>
+                <span>Markets</span>
+            </a>
+
+            <a href="#trade">
+                <span class="ico">⇄</span>
+                <span>Trade</span>
+            </a>
+
+            <a href="#positions">
+                <span class="ico">▤</span>
+                <span>Positions</span>
+            </a>
+
+            <a href="#watchlist">
+                <span class="ico">☆</span>
+                <span>Watchlist</span>
+            </a>
+
+        </nav>
+
+    </div>
+
+    <div>
+
+        <div class="nav-label">
+            ACCOUNT
+        </div>
+
+        <nav class="nav">
+
+            <a href="#">
+                <span class="ico">◉</span>
+                <span>Wallet</span>
+            </a>
+
+            <a href="#">
+                <span class="ico">⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+    </div>
+
+    <div class="side-bottom">
+
+        <small>Market status</small>
+
+        <strong>
+            <span class="positive">●</span>
+            Markets are open
+        </strong>
+
+        <small>
+            Demo environment · Simulated prices
+        </small>
+
+        <button class="upgrade">
+            Explore Pro
+        </button>
+
+    </div>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main class="main">
+
+<header class="topbar">
+
+    <input
+        class="search"
+        placeholder="⌕  Search markets..."
+        aria-label="Search markets"
+    >
+
+    <div class="top-actions">
+
+        <span class="subtle hide-mobile">
+            Demo account
+        </span>
+
+        <button class="icon-btn">
+            ♧
+        </button>
+
+        <div class="avatar">
+            F
+        </div>
+
+    </div>
+
+</header>
+
+
+<div class="content">
+
+    <!-- HEADER -->
+
+    <div class="welcome">
+
+        <div>
+
+            <h1>
+                Trading overview
+            </h1>
+
+            <p>
+                Welcome back, Freddie. Here's your market snapshot.
+            </p>
+
+        </div>
+
+        <div class="date" id="date"></div>
+
+    </div>
+
+
+    <!-- STAT CARDS -->
+
+    <section class="stats">
+
+        <div class="stat">
+
+            <div class="stat-head">
+                Total balance
+                <span class="stat-icon">◉</span>
+            </div>
+
+            <div
+                class="stat-value"
+                id="balance"
+            >
+                $25,000.00
+            </div>
+
+            <div class="stat-foot">
+                Demo funds · USD
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-head">
+                Today's P&amp;L
+                <span class="stat-icon">↗</span>
+            </div>
+
+            <div
+                class="stat-value positive"
+                id="dailyPnl"
+            >
+                +$248.60
+            </div>
+
+            <div class="stat-foot">
+                <span class="positive">
+                    +1.02%
+                </span>
+                today
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-head">
+                Available margin
+                <span class="stat-icon">▣</span>
+            </div>
+
+            <div
+                class="stat-value"
+                id="margin"
+            >
+                $21,420.00
+            </div>
+
+            <div class="stat-foot">
+                85.7% of account balance
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-head">
+                Open positions
+                <span class="stat-icon">⌁</span>
+            </div>
+
+            <div
+                class="stat-value"
+                id="positionCount"
+            >
+                02
+            </div>
+
+            <div class="stat-foot">
+                Across 2 markets
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- WORKSPACE -->
+
+    <div class="workspace">
+
+
+        <!-- LEFT -->
+
+        <div class="left-col">
+
+
+            <!-- CHART -->
+
+            <section
+                class="panel"
+                id="markets"
+            >
+
+                <div class="panel-title">
+
+                    <div class="pair">
+
+                        <div class="coin">
+                            ₿
+                        </div>
+
+                        <div>
+
+                            <div class="pair-name">
+                                BTC / USD
+                                <span class="subtle">
+                                    Bitcoin
+                                </span>
+                            </div>
+
+                            <div class="subtle">
+                                Crypto · Spot market
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="subtle">
+                        ●
+                        <span class="positive">
+                            Live demo
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="price-line">
+
+                    <span
+                        class="big-price"
+                        id="btcPrice"
+                    >
+                        $67,482.35
+                    </span>
+
+                    <span
+                        class="positive"
+                        id="btcChange"
+                    >
+                        +1.84%
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="panel-title"
+                    style="margin-top:17px;margin-bottom:4px"
+                >
+
+                    <div class="chart-tools">
+
+                        <button class="selected">
+                            Candles
+                        </button>
+
+                        <button>
+                            Line
+                        </button>
+
+                    </div>
+
+
+                    <div class="range-tabs">
+
+                        <button>1m</button>
+
+                        <button>5m</button>
+
+                        <button class="selected">
+                            1H
+                        </button>
+
+                        <button>4H</button>
+
+                        <button>1D</button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chart-wrap">
+
+                    <canvas id="chart"></canvas>
+
+                </div>
+
+
+                <div class="chart-legend">
+
+                    <span>
+                        <i
+                            class="dot"
+                            style="background:#19c784"
+                        ></i>
+                        Up candle
+                    </span>
+
+                    <span>
+                        <i
+                            class="dot"
+                            style="background:#f05b6b"
+                        ></i>
+                        Down candle
+                    </span>
+
+                    <span>
+                        Illustrative demo price feed
+                    </span>
+
+                </div>
+
+            </section>
+
+
+            <!-- ORDER FORM -->
+
+            <section
+                class="panel"
+                id="trade"
+            >
+
+                <div class="panel-title">
+
+                    <h2>
+                        Place an order
+                    </h2>
+
+                    <span class="subtle">
+                        BTC / USD · Market order
+                    </span>
+
+                </div>
+
+
+                <div class="order-grid">
+
+                    <div class="order-card">
+
+                        <label>
+                            Order type
+                        </label>
+
+                        <select id="orderType">
+
+                            <option>
+                                Market
+                            </option>
+
+                            <option>
+                                Limit
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="order-card">
+
+                        <label>
+                            Leverage
+                        </label>
+
+                        <select id="leverage">
+
+                            <option>1×</option>
+                            <option>2×</option>
+                            <option>5×</option>
+                            <option>10×</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="order-card">
+
+                        <label>
+                            Amount (USD)
+                        </label>
+
+                        <input
+                            id="amount"
+                            type="number"
+                            min="1"
+                            step="1"
+                            value="500"
+                        >
+
+                    </div>
+
+
+                    <div class="order-card">
+
+                        <label>
+                            Estimated quantity
+                        </label>
+
+                        <input
+                            id="quantity"
+                            readonly
+                            value="0.007409 BTC"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="trade-actions">
+
+                    <button
+                        class="buy"
+                        id="buyBtn"
+                    >
+                        Buy / Long
+                    </button>
+
+                    <button
+                        class="sell"
+                        id="sellBtn"
+                    >
+                        Sell / Short
+                    </button>
+
+                </div>
+
+
+                <div class="order-note">
+
+                    Demo trading only.
+                    Orders are simulated in this browser and
+                    do not connect to a broker or execute real trades.
+
+                </div>
+
+            </section>
+
+
+            <!-- POSITIONS -->
+
+            <section
+                class="panel"
+                id="positions"
+            >
+
+                <div class="panel-title">
+
+                    <h2>
+                        Open positions
+                    </h2>
+
+                    <span class="subtle">
+                        Your active demo trades
+                    </span>
+
+                </div>
+
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>MARKET</th>
+                                <th>TYPE</th>
+                                <th>SIZE</th>
+                                <th>ENTRY</th>
+                                <th>MARK PRICE</th>
+                                <th>P&amp;L</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="positionsBody">
+
+                            <tr>
+
+                                <td>
+                                    BTC/USD
+                                </td>
+
+                                <td>
+                                    <span class="pill">
+                                        Long
+                                    </span>
+                                </td>
+
+                                <td>
+                                    $2,000
+                                </td>
+
+                                <td>
+                                    $66,910
+                                </td>
+
+                                <td id="mark1">
+                                    $67,482
+                                </td>
+
+                                <td
+                                    class="positive"
+                                    id="pnl1"
+                                >
+                                    +$17.10
+                                </td>
+
+                            </tr>
+
+
+                            <tr>
+
+                                <td>
+                                    ETH/USD
+                                </td>
+
+                                <td>
+                                    <span class="pill loss">
+                                        Short
+                                    </span>
+                                </td>
+
+                                <td>
+                                    $1,000
+                                </td>
+
+                                <td>
+                                    $3,420
+                                </td>
+
+                                <td>
+                                    $3,398
+                                </td>
+
+                                <td class="positive">
+                                    +$6.43
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </div>
+
+
+        <!-- RIGHT -->
+
+        <div class="right-col">
+
+
+            <!-- WATCHLIST -->
+
+            <section
+                class="panel"
+                id="watchlist"
+            >
+
+                <div class="panel-title">
+
+                    <h2>
+                        Watchlist
+                    </h2>
+
+                    <span class="subtle">
+                        24h change
+                    </span>
+
+                </div>
+
+
+                <div class="watchlist">
+
+
+                    <div class="watch-row">
+
+                        <div class="asset">
+
+                            <div
+                                class="asset-logo"
+                                style="color:#f7931a"
+                            >
+                                ₿
+                            </div>
+
+                            <div>
+                                Bitcoin
+                                <small>BTC/USD</small>
+                            </div>
+
+                        </div>
+
+                        <div
+                            class="watch-price"
+                            id="watchBtc"
+                        >
+                            $67,482
+                        </div>
+
+                        <div class="watch-change positive">
+                            +1.84%
+                        </div>
+
+                    </div>
+
+
+                    <div class="watch-row">
+
+                        <div class="asset">
+
+                            <div
+                                class="asset-logo"
+                                style="color:#9ba9ff"
+                            >
+                                ◆
+                            </div>
+
+                            <div>
+                                Ethereum
+                                <small>ETH/USD</small>
+                            </div>
+
+                        </div>
+
+                        <div class="watch-price">
+                            $3,398
+                        </div>
+
+                        <div class="watch-change positive">
+                            +0.62%
+                        </div>
+
+                    </div>
+
+
+                    <div class="watch-row">
+
+                        <div class="asset">
+
+                            <div
+                                class="asset-logo"
+                                style="color:#39b9a2"
+                            >
+                                ◎
+                            </div>
+
+                            <div>
+                                Solana
+                                <small>SOL/USD</small>
+                            </div>
+
+                        </div>
+
+                        <div class="watch-price">
+                            $182.40
+                        </div>
+
+                        <div class="watch-change negative">
+                            −0.38%
+                        </div>
+
+                    </div>
+
+
+                    <div class="watch-row">
+
+                        <div class="asset">
+
+                            <div
+                                class="asset-logo"
+                                style="color:#a9b6c8"
+                            >
+                                €
+                            </div>
+
+                            <div>
+                                Euro / Dollar
+                                <small>EUR/USD</small>
+                            </div>
+
+                        </div>
+
+                        <div class="watch-price">
+                            1.0842
+                        </div>
+
+                        <div class="watch-change positive">
+                            +0.12%
+                        </div>
+
+                    </div>
+
+
+                    <div class="watch-row">
+
+                        <div class="asset">
+
+                            <div
+                                class="asset-logo"
+                                style="color:#83b7ff"
+                            >
+                                G
+                            </div>
+
+                            <div>
+                                Gold
+                                <small>XAU/USD</small>
+                            </div>
+
+                        </div>
+
+                        <div class="watch-price">
+                            $2,342
+                        </div>
+
+                        <div class="watch-change positive">
+                            +0.44%
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ORDER BOOK -->
+
+            <section class="panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Order book
+                    </h2>
+
+                    <span class="subtle">
+                        BTC / USD
+                    </span>
+
+                </div>
+
+
+                <div class="book">
+
+                    <div class="asks">
+
+                        <div class="book-head">
+                            <span>PRICE (USD)</span>
+                            <span>AMOUNT</span>
+                        </div>
+
+                        <div class="book-row">
+                            <i
+                                class="depth"
+                                style="width:65%"
+                            ></i>
+
+                            <span>67,495.20</span>
+                            <span>0.42</span>
+                        </div>
+
+                        <div class="book-row">
+                            <i
+                                class="depth"
+                                style="width:42%"
+                            ></i>
+
+                            <span>67,491.10</span>
+                            <span>0.28</span>
+                        </div>
+
+                        <div class="book-row">
+                            <i
+                                class="depth"
+                                style="width:80%"
+                            ></i>
+
+                            <span>67,488.50</span>
+                            <span>0.56</span>
+                        </div>
+
+                        <div class="book-row">
+                            <i
+                                class="depth"
+                                style="width:30%"
+                            ></i>
+
+                            <span>67,485.00</span>
+                            <span>0.19</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="bids">
+
+                        <div class="book-head">
+                            <span>PRICE (USD)</span>
+                            <span>AMOUNT</span>
+                        </div>
+
+                        <div class="book-row">
+                            <i
+                                class="depth"
+                                style="width:52%"
+                            ></i>
+
+                            <span>67,480.20</span>
+                            <span>0.33</span>
+                        </div>
+
+                        <div class="book-row">
+                            <i
+                                class="depth"
+                                style="width:74%"
+                            ></i>
+
+                            <span>67,477.10</span>
+                            <span>0.49</span>
+                        </div>
+
+                        <div class="book-row">
+                            <i
+                                class="depth"
+                                style="width:36%"
+                            ></i>
+
+                            <span>67,472.80</span>
+                            <span>0.24</span>
+                        </div>
+
+                        <div class="book-row">
+                            <i
+                                class="depth"
+                                style="width:90%"
+                            ></i>
+
+                            <span>67,469.40</span>
+                            <span>0.61</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ACTIVITY -->
+
+            <section class="panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Recent activity
+                    </h2>
+
+                    <span class="subtle">
+                        Today
+                    </span>
+
+                </div>
+
+
+                <div class="watch-row">
+
+                    <div>
+
+                        <b>
+                            BTC/USD Long
+                        </b>
+
+                        <small
+                            class="subtle"
+                            style="display:block;margin-top:4px"
+                        >
+                            Market order · 10:42
+                        </small>
+
+                    </div>
+
+                    <span class="positive">
+                        Filled
+                    </span>
+
+                </div>
+
+
+                <div class="watch-row">
+
+                    <div>
+
+                        <b>
+                            ETH/USD Short
+                        </b>
+
+                        <small
+                            class="subtle"
+                            style="display:block;margin-top:4px"
+                        >
+                            Limit order · 09:18
+                        </small>
+
+                    </div>
+
+                    <span class="positive">
+                        Filled
+                    </span>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+</main>
+
+</div>
+
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+<script>
+
+/* =====================================
+   BASIC HELPERS
+===================================== */
+
+const $ = id => document.getElementById(id);
+
+let price = 67482.35;
+let balance = 25000;
+let positions = 2;
+
+
+/* =====================================
+   MONEY FORMAT
+===================================== */
+
+const money = n => {
+
+    return '$' + n.toLocaleString(
+        'en-US',
+        {
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        }
+    );
+
+};
+
+
+/* =====================================
+   DATE
+===================================== */
+
+$('date').textContent =
+    new Date().toLocaleDateString(
+        undefined,
+        {
+            weekday:'short',
+            month:'short',
+            day:'numeric',
+            year:'numeric'
+        }
+    );
+
+
+/* =====================================
+   TOAST MESSAGE
+===================================== */
+
+function notify(message){
+
+    const toast = $('toast');
+
+    toast.textContent = message;
+
+    toast.classList.add('show');
+
+    setTimeout(() => {
+
+        toast.classList.remove('show');
+
+    },2600);
+
+}
+
+
+/* =====================================
+   QUANTITY CALCULATION
+===================================== */
+
+function updateQty(){
+
+    const amount =
+        Math.max(
+            0,
+            Number($('amount').value) || 0
+        );
+
+    $('quantity').value =
+        (amount / price).toFixed(6) +
+        ' BTC';
+
+}
+
+$('amount').addEventListener(
+    'input',
+    updateQty
+);
+
+
+/* =====================================
+   BUY / SELL
+===================================== */
+
+function trade(side){
+
+    const amount =
+        Number($('amount').value);
+
+    if(!amount || amount <= 0){
+
+        notify(
+            'Enter a valid order amount.'
+        );
+
+        return;
+
+    }
+
+    if(amount > balance){
+
+        notify(
+            'Insufficient demo balance for this order.'
+        );
+
+        return;
+
+    }
+
+
+    balance -= amount * 0.001;
+
+    $('balance').textContent =
+        money(balance);
+
+    $('margin').textContent =
+        money(balance - amount * 0.14);
+
+
+    positions++;
+
+    $('positionCount').textContent =
+        String(positions).padStart(2,'0');
+
+
+    const body =
+        $('positionsBody');
+
+
+    const row =
+        document.createElement('tr');
+
+
+    row.innerHTML = `
+
+        <td>
+            BTC/USD
+        </td>
+
+        <td>
+
+            <span class="pill ${
+                side === 'Sell'
+                ? 'loss'
+                : ''
+            }">
+
+                ${
+                    side === 'Buy'
+                    ? 'Long'
+                    : 'Short'
+                }
+
+            </span>
+
+        </td>
+
+        <td>
+            ${money(amount)}
+        </td>
+
+        <td>
+            ${money(price)}
+        </td>
+
+        <td>
+            ${money(price)}
+        </td>
+
+        <td class="subtle">
+            —
+        </td>
+
+    `;
+
+
+    body.prepend(row);
+
+
+    notify(
+        `${side} order simulated successfully · ${money(amount)}`
+    );
+
+}
+
+
+$('buyBtn').addEventListener(
+    'click',
+    () => trade('Buy')
+);
+
+
+$('sellBtn').addEventListener(
+    'click',
+    () => trade('Sell')
+);
+
+
+/* =====================================
+   CANDLE CHART
+===================================== */
+
+const canvas =
+    $('chart');
+
+const ctx =
+    canvas.getContext('2d');
+
+
+let candles = [];
+
+
+/* Generate initial candles */
+
+function seed(){
+
+    let p = 67000;
+
+    for(let i=0;i<62;i++){
+
+        let o = p;
+
+        let c =
+            o +
+            (Math.random() - .46) * 360;
+
+        let h =
+            Math.max(o,c) +
+            Math.random() * 150;
+
+        let l =
+            Math.min(o,c) -
+            Math.random() * 150;
+
+
+        candles.push({
+            o,
+            c,
+            h,
+            l
+        });
+
+
+        p = c;
+
+    }
+
+}
+
+seed();
+
+
+/* =====================================
+   DRAW CHART
+===================================== */
+
+function draw(){
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+
+    canvas.width =
+        rect.width * dpr;
+
+    canvas.height =
+        rect.height * dpr;
+
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+
+    const w = rect.width;
+
+    const h = rect.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+
+    /* Grid */
+
+    ctx.strokeStyle =
+        '#1d2b3e';
+
+    ctx.lineWidth = 1;
+
+
+    for(let i=1;i<5;i++){
+
+        let y =
+            h * i / 5;
+
+        ctx.beginPath();
+
+        ctx.moveTo(0,y);
+
+        ctx.lineTo(w,y);
+
+        ctx.stroke();
+
+    }
+
+
+    /* Price range */
+
+    const max =
+        Math.max(
+            ...candles.map(x => x.h)
+        ) + 180;
+
+
+    const min =
+        Math.min(
+            ...candles.map(x => x.l)
+        ) - 180;
+
+
+    const py =
+        v =>
+        h -
+        ((v-min)/(max-min))*h;
+
+
+    const step =
+        w / candles.length;
+
+
+    const candleWidth =
+        Math.max(
+            3,
+            step * .55
+        );
+
+
+    /* Candles */
+
+    candles.forEach((c,i) => {
+
+        const x =
+            i * step +
+            step / 2;
+
+
+        const up =
+            c.c >= c.o;
+
+
+        ctx.strokeStyle =
+            up
+            ? '#19c784'
+            : '#f05b6b';
+
+
+        ctx.fillStyle =
+            ctx.strokeStyle;
+
+
+        /* Wick */
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            py(c.h)
+        );
+
+        ctx.lineTo(
+            x,
+            py(c.l)
+        );
+
+        ctx.stroke();
+
+
+        /* Body */
+
+        const y =
+            py(
+                Math.max(c.o,c.c)
+            );
+
+
+        const bodyHeight =
+            Math.max(
+                2,
+                Math.abs(
+                    py(c.o) -
+                    py(c.c)
+                )
+            );
+
+
+        ctx.fillRect(
+            x - candleWidth/2,
+            y,
+            candleWidth,
+            bodyHeight
+        );
+
+    });
+
+
+    /* Current price line */
+
+    const y =
+        py(price);
+
+
+    ctx.setLineDash([
+        4,
+        4
+    ]);
+
+    ctx.strokeStyle =
+        '#4d8dff';
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        y
+    );
+
+    ctx.lineTo(
+        w,
+        y
+    );
+
+    ctx.stroke();
+
+
+    ctx.setLineDash([]);
+
+
+    /* Price label */
+
+    ctx.fillStyle =
+        '#4d8dff';
+
+
+    ctx.fillRect(
+        w - 72,
+        y - 9,
+        72,
+        18
+    );
+
+
+    ctx.fillStyle =
+        '#fff';
+
+
+    ctx.font =
+        '10px Arial';
+
+
+    ctx.fillText(
+        price.toFixed(0),
+        w - 66,
+        y + 4
+    );
+
+}
+
+
+/* =====================================
+   SIMULATED MARKET TICK
+===================================== */
+
+function tick(){
+
+    price +=
+        (Math.random() - .48) * 34;
+
+
+    price =
+        Math.max(
+            65000,
+            price
+        );
+
+
+    $('btcPrice').textContent =
+        money(price);
+
+
+    $('watchBtc').textContent =
+        '$' +
+        Math.round(price)
+        .toLocaleString();
+
+
+    $('btcChange').textContent =
+        (
+            price >= 67482.35
+            ? '+'
+            : ''
+        ) +
+        (
+            (price / 67482.35 - 1)
+            * 100
+        ).toFixed(2) +
+        '%';
+
+
+    $('mark1').textContent =
+        '$' +
+        Math.round(price)
+        .toLocaleString();
+
+
+    $('pnl1').textContent =
+        (
+            price - 66910 > 0
+            ? '+'
+            : ''
+        ) +
+        money(
+            (price - 66910) * .03
+        );
+
+
+    /* Update last candle */
+
+    let last =
+        candles[candles.length - 1];
+
+
+    last.c =
+        price;
+
+
+    last.h =
+        Math.max(
+            last.h,
+            price
+        );
+
+
+    last.l =
+        Math.min(
+            last.l,
+            price
+        );
+
+
+    /* Occasionally create new candle */
+
+    if(Math.random() > .65){
+
+        let o =
+            last.c;
+
+
+        candles.push({
+
+            o,
+
+            c:
+                o +
+                (Math.random() - .48) * 100,
+
+            h:
+                o + 100,
+
+            l:
+                o - 100
+
+        });
+
+
+        if(candles.length > 62){
+
+            candles.shift();
+
+        }
+
+    }
+
+
+    draw();
+
+    updateQty();
+
+}
+
+
+/* =====================================
+   INITIALIZE
+===================================== */
+
+window.addEventListener(
+    'resize',
+    draw
+);
+
+
+draw();
+
+updateQty();
+
+
+/* Update market every 1.8 seconds */
+
+setInterval(
+    tick,
+    1800
+);
+
+</script>
+
+</body>
+</html>
